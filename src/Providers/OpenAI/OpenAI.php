@@ -74,6 +74,21 @@ class OpenAI implements AIProviderInterface
     public function generateToolsPayload(): array
     {
         return \array_map(function (ToolInterface $tool) {
+
+            //try to get functions from the modules
+            $fn = \Illuminate\Support\Arr::first(\ErmirShehaj\Ai\Classes\Helper::getAvailableFunctions(), function($val) use($tool) {
+
+                return $val['name'] == $tool->getName();
+            });
+
+            if($fn) {
+
+                return $payload = [
+                    'type' => 'function',
+                    'function' => $fn
+                ];
+            }
+            
             $payload = [
                 'type' => 'function',
                 'function' => [
